@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database';
+import { bookRoutes } from './routes/book.routes';
 
 dotenv.config();
 
@@ -12,6 +13,9 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+
+// Routes
+app.use('/api/books', bookRoutes);
 
 // Server startup
 const startServer = async () => {
