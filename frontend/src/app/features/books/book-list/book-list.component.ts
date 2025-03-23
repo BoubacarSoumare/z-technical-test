@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BookService } from '../../../core/services/book.service';
+import { Book } from '../../../core/models/book.model';
 
 @Component({
   selector: 'app-book-list',
@@ -10,10 +11,14 @@ import { BookService } from '../../../core/services/book.service';
   templateUrl: './book-list.component.html',
   styleUrls: ['./book-list.component.scss']
 })
-export class BookListComponent {
-  books = this.bookService.books;
+export class BookListComponent implements OnInit {
+  books = signal<Book[]>([]);
 
   constructor(private bookService: BookService) {}
+
+  ngOnInit(): void {
+    this.books.set(this.bookService.books());
+  }
 
   deleteBook(id: string): void {
     if (confirm('Are you sure you want to delete this book?')) {

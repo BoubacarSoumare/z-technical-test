@@ -19,10 +19,16 @@
             </small>
           </p>
           <div class="btn-group w-100">
-            <button class="btn btn-outline-primary" [routerLink]="['edit', book._id]">
+            <button
+              class="btn btn-outline-primary"
+              [routerLink]="['edit', book._id]"
+            >
               Edit
             </button>
-            <button class="btn btn-outline-danger" (click)="deleteBook(book._id!)">
+            <button
+              class="btn btn-outline-danger"
+              (click)="deleteBook(book._id!)"
+            >
               Delete
             </button>
           </div>
