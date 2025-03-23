@@ -17,25 +17,24 @@ app.use(express.json());
 
 // Routes
 app.use('/api/books', bookRoutes);
-
-// Error handling middleware (must be after routes)
 app.use(errorHandler);
 
-// Server startup
-const startServer = async () => {
-  try {
-    await connectDB();
-
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Server failed to start:', error);
-    process.exit(1);
-  }
-};
-
-startServer();
+// Only start server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  const startServer = async () => {
+    try {
+      await connectDB();
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    } catch (error) {
+      console.error('Server failed to start:', error);
+      process.exit(1);
+    }
+  };
+  
+  startServer();
+}
 
 export default app;

@@ -27,7 +27,7 @@ export const bookController = {
   },
 
   // Create a new book
-  async createBook(req: Request, res: Response) {
+  async createBook(req: Request, res: Response, next: NextFunction) {
     try {
       const book = new Book({
         ...req.body,
@@ -36,12 +36,12 @@ export const bookController = {
       const savedBook = await book.save();
       res.status(201).json(savedBook);
     } catch (error) {
-      res.status(400).json({ message: 'Error creating book', error });
+      next(error);
     }
   },
 
   // Update a book
-  async updateBook(req: Request, res: Response) {
+  async updateBook(req: Request, res: Response, next: NextFunction) {
     try {
       const book = await Book.findByIdAndUpdate(
         req.params.id,
@@ -52,24 +52,24 @@ export const bookController = {
         { new: true, runValidators: true }
       );
       if (!book) {
-        return res.status(404).json({ message: 'Book not found' });
+        throw new NotFoundError('Book not found');
       }
       res.status(200).json(book);
     } catch (error) {
-      res.status(400).json({ message: 'Error updating book', error });
+      next(error);
     }
   },
 
   // Delete a book
-  async deleteBook(req: Request, res: Response) {
+  async deleteBook(req: Request, res: Response, next: NextFunction) {
     try {
       const book = await Book.findByIdAndDelete(req.params.id);
       if (!book) {
-        return res.status(404).json({ message: 'Book not found' });
+        throw new NotFoundError('Book not found');
       }
       res.status(200).json({ message: 'Book deleted successfully' });
     } catch (error) {
-      res.status(400).json({ message: 'Error deleting book', error });
+      next(error);
     }
   }
 };
