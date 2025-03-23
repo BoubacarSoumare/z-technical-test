@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database';
 import { bookRoutes } from './routes/book.routes';
+import { errorHandler } from './middleware/error.middleware';
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/books', bookRoutes);
+
+// Error handling middleware (must be after routes)
+app.use(errorHandler);
 
 // Server startup
 const startServer = async () => {

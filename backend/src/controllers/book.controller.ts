@@ -1,27 +1,28 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Book } from '../models/book.model';
+import { NotFoundError } from '../types/error.types';
 
 export const bookController = {
   // Get all books
-  async getAllBooks(req: Request, res: Response) {
+  async getAllBooks(req: Request, res: Response, next: NextFunction) {
     try {
       const books = await Book.find().sort({ lastModifiedDate: -1 });
       res.status(200).json(books);
     } catch (error) {
-      res.status(500).json({ message: 'Error retrieving books', error });
+      next(error);
     }
   },
 
   // Get a single book by ID
-  async getBookById(req: Request, res: Response) {
+  async getBookById(req: Request, res: Response, next: NextFunction) {
     try {
       const book = await Book.findById(req.params.id);
       if (!book) {
-        return res.status(404).json({ message: 'Book not found' });
+        throw new NotFoundError('Book not found');
       }
       res.status(200).json(book);
     } catch (error) {
-      res.status(500).json({ message: 'Error retrieving book', error });
+      next(error);
     }
   },
 
