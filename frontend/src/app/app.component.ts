@@ -1,12 +1,22 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    HttpClientModule
+  ],
+  template: `
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+  `
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'Personal Library';
 }
