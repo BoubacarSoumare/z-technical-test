@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../types/error.types';
 import mongoose from 'mongoose';
+
+export class ApiError extends Error {
+  constructor(public statusCode: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
 
 export const errorHandler = (
   err: Error,
@@ -28,8 +34,7 @@ export const errorHandler = (
   // Handle custom API errors
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
-      message: err.message,
-      details: err.details
+      message: err.message
     });
   }
 

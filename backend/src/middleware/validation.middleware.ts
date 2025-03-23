@@ -8,44 +8,36 @@ export const bookValidation = {
       .notEmpty()
       .withMessage('Title is required')
       .isLength({ max: 200 })
-      .withMessage('Title must be less than 200 characters'),
-    
+      .withMessage('Title cannot exceed 200 characters'),
     body('author')
       .trim()
       .notEmpty()
       .withMessage('Author is required')
       .isLength({ max: 100 })
-      .withMessage('Author must be less than 100 characters'),
-    
+      .withMessage('Author cannot exceed 100 characters'),
     body('note')
       .optional()
       .trim()
       .isLength({ max: 1000 })
-      .withMessage('Note must be less than 1000 characters'),
+      .withMessage('Note cannot exceed 1000 characters')
   ],
-  
   update: [
-    param('id')
-      .isMongoId()
-      .withMessage('Invalid book ID'),
-    
+    param('id').isMongoId().withMessage('Invalid book ID'),
     body('title')
       .optional()
       .trim()
       .isLength({ max: 200 })
-      .withMessage('Title must be less than 200 characters'),
-    
+      .withMessage('Title cannot exceed 200 characters'),
     body('author')
       .optional()
       .trim()
       .isLength({ max: 100 })
-      .withMessage('Author must be less than 100 characters'),
-    
+      .withMessage('Author cannot exceed 100 characters'),
     body('note')
       .optional()
       .trim()
       .isLength({ max: 1000 })
-      .withMessage('Note must be less than 1000 characters'),
+      .withMessage('Note cannot exceed 1000 characters')
   ]
 };
 
