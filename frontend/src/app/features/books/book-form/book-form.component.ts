@@ -57,35 +57,44 @@ export class BookFormComponent implements OnInit {
   }
 
   loadBook(id: string): void {
-    this.bookService.getBook(id).subscribe(book => {
-      this.bookForm.patchValue(book);
+    this.loading.set(true);
+    this.bookService.getBook(id).subscribe({
+      next: (book) => {
+        this.bookForm.patchValue(book);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading book:', err);
+        this.error.set('Failed to load book');
+        this.loading.set(false);
+      }
     });
   }
 
   onSubmit(): void {
-    this.submitted = true;
+    if (!this.bookForm.valid) return;
 
-    if (this.bookForm.valid) {
-      this.loading.set(true);
-      this.error.set(null);
+    this.loading.set(true);
+    this.error.set(null);
 
-      const book: Book = {
-        ...this.bookForm.value,
-        lastModifiedDate: new Date()
-      };
+    const book: Book = {
+      ...this.bookForm.value,
+      lastModifiedDate: new Date()
+    };
 
-      try {
-        if (this.isEditMode && this.bookId) {
-          this.bookService.updateBook(this.bookId, book);
-        } else {
-          this.bookService.createBook(book);
-        }
+    const request$ = this.isEditMode && this.bookId
+      ? this.bookService.updateBook(this.bookId, book)
+      : this.bookService.createBook(book);
+
+    request$.subscribe({
+      next: () => {
         this.router.navigate(['/books']);
-      } catch (err) {
+      },
+      error: (err) => {
+        console.error('Error saving book:', err);
         this.error.set('Failed to save book. Please try again.');
-      } finally {
         this.loading.set(false);
       }
-    }
+    });
   }
 }

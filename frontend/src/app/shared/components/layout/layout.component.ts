@@ -12,8 +12,9 @@ import { RouterModule } from '@angular/router';
         <a class="navbar-brand" routerLink="/">My Library</a>
       </div>
     </nav>
-
-    <router-outlet></router-outlet>
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
   `
 })
 export class LayoutComponent {}
