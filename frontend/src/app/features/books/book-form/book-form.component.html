@@ -1,0 +1,86 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h2>{{ isEditMode ? 'Edit' : 'Add' }} Book</h2>
+        </div>
+
+        <div class="card-body">
+          <!-- Error Alert -->
+          <alert type="danger" *ngIf="error()">{{ error() }}</alert>
+
+          <form [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+            <!-- Title Field -->
+            <div class="mb-3">
+              <label for="title" class="form-label">Title*</label>
+              <input
+                type="text"
+                id="title"
+                class="form-control"
+                [class.is-invalid]="hasError('title')"
+                formControlName="title"
+                placeholder="Enter book title"
+              >
+              <div *ngIf="hasError('title')" class="invalid-feedback">
+                {{ f['title'].errors?.['required'] ? 'Title is required' : 'Title cannot exceed 200 characters' }}
+              </div>
+            </div>
+
+            <!-- Author Field -->
+            <div class="mb-3">
+              <label for="author" class="form-label">Author*</label>
+              <input
+                type="text"
+                id="author"
+                class="form-control"
+                [class.is-invalid]="hasError('author')"
+                formControlName="author"
+                placeholder="Enter author name"
+              >
+              <div *ngIf="hasError('author')" class="invalid-feedback">
+                {{ f['author'].errors?.['required'] ? 'Author is required' : 'Author cannot exceed 100 characters' }}
+              </div>
+            </div>
+
+            <!-- Note Field -->
+            <div class="mb-3">
+              <label for="note" class="form-label">Note</label>
+              <textarea
+                id="note"
+                class="form-control"
+                [class.is-invalid]="hasError('note')"
+                formControlName="note"
+                rows="3"
+                placeholder="Add a note (optional)"
+              ></textarea>
+              <div *ngIf="hasError('note')" class="invalid-feedback">
+                Note cannot exceed 1000 characters
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="loading()"
+              >
+                <span *ngIf="loading()" class="spinner-border spinner-border-sm me-1"></span>
+                {{ isEditMode ? 'Update' : 'Create' }} Book
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                routerLink="/books"
+                [disabled]="loading()"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
