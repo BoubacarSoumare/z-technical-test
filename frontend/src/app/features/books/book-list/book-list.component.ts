@@ -14,15 +14,19 @@ import { Book } from '../../../core/models/book.model';
 export class BookListComponent implements OnInit {
   books = signal<Book[]>([]);
 
-  constructor(private bookService: BookService) {}
+  constructor(private bookService: BookService) {
+    this.books = this.bookService.books;
+  }
 
   ngOnInit(): void {
-    this.books.set(this.bookService.books());
+    // Books will be loaded by the service constructor
   }
 
   deleteBook(id: string): void {
     if (confirm('Are you sure you want to delete this book?')) {
-      this.bookService.deleteBook(id);
+      this.bookService.deleteBook(id).subscribe(() => {
+        this.bookService.loadBooks();
+      });
     }
   }
 }

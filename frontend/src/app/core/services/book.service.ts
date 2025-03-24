@@ -11,15 +11,19 @@ export class BookService {
   private apiUrl = `${environment.apiUrl}/books`;
   private booksSignal = signal<Book[]>([]);
 
-  books = this.booksSignal;
-
   constructor(private http: HttpClient) {
     this.loadBooks();
   }
 
+  get books() {
+    return this.booksSignal;
+  }
+
   loadBooks(): void {
-    this.http.get<Book[]>(this.apiUrl)
-      .subscribe(books => this.booksSignal.set(books));
+    this.http.get<Book[]>(this.apiUrl).subscribe({
+      next: (books) => this.booksSignal.set(books),
+      error: (error) => console.error('Error loading books:', error)
+    });
   }
 
   getBook(id: string): Observable<Book> {
