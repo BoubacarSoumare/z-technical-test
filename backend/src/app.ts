@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import bookRoutes from './routes/book.routes';
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './config/swagger.config';
 
 interface ExtendedRoute extends IRoute<any> {
   methods: { [key: string]: boolean };
@@ -33,6 +35,9 @@ app.use((req: Request, res: Response, next) => {
 // Essential middleware
 app.use(cors());
 app.use(express.json());
+
+// Swagger documentation route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Health check
 app.get('/api/health', (req, res) => {
