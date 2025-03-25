@@ -1,75 +1,82 @@
-import { Request, Response, NextFunction } from 'express';
-import { Book } from '../models/book.model';
-import { NotFoundError } from '../types/error.types';
+import { Request, Response } from 'express';
+import { BookService } from '../services/book.service';
+import { AuthRequest } from '../middleware/auth.middleware';
+
+const bookService = new BookService();
 
 export const bookController = {
-  // Get all books
-  async getAllBooks(req: Request, res: Response, next: NextFunction) {
+  getBooks: async (req: AuthRequest, res: Response) => {
     try {
-      const books = await Book.find().sort({ lastModifiedDate: -1 });
-      res.status(200).json(books);
+      const books = await bookService.getBooks(req.userId);
+      res.json(books);
     } catch (error) {
-      next(error);
+      console.error('Error fetching books:', error);
+      res.status(500).json({ message: 'Error fetching books' });
     }
   },
 
-  // Get a single book by ID
-  async getBookById(req: Request, res: Response, next: NextFunction) {
+  getBookById: async (req: Request, res: Response) => {
     try {
-      const book = await Book.findById(req.params.id);
-      if (!book) {
-        throw new NotFoundError('Book not found');
-      }
-      res.status(200).json(book);
+      const { id } = req.params;
+      const book = await bookService.getBookById(id);
+      res.json(book);
     } catch (error) {
-      next(error);
+      console.error('Error fetching book:', error);
+      res.status(404).json({ message: 'Book not found' });
     }
   },
 
-  // Create a new book
-  async createBook(req: Request, res: Response, next: NextFunction) {
+  createBook: async (req: AuthRequest, res: Response) => {
     try {
-      const book = new Book({
+      const bookData = {
         ...req.body,
-        lastModifiedDate: new Date()
-      });
-      const savedBook = await book.save();
-      res.status(201).json(savedBook);
+        userId: req.userId
+      };
+      const book = await bookService.createBook(bookData);
+      res.status(201).json(book);
     } catch (error) {
-      next(error);
+      console.error('Error creating book:', error);
+      res.status(500).json({ message: 'Error creating book' });
     }
   },
 
-  // Update a book
-  async updateBook(req: Request, res: Response, next: NextFunction) {
+  updateBook: async (req: AuthRequest, res: Response) => {
     try {
-      const book = await Book.findByIdAndUpdate(
-        req.params.id,
-        { 
-          ...req.body,
-          lastModifiedDate: new Date()
-        },
-        { new: true, runValidators: true }
-      );
-      if (!book) {
-        throw new NotFoundError('Book not found');
+      const { id } = req.params;
+      if (!req.userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
       }
-      res.status(200).json(book);
+
+      const book = await bookService.updateBook(id, req.body, req.userId);
+      if (!book) {
+        return res.status(404).json({ message: 'Book not found' });
+      }
+
+      res.json(book);
     } catch (error) {
-      next(error);
+      console.error('Error updating book:', error);
+      res.status(500).json({ message: 'Error updating book' });
     }
   },
 
-  // Delete a book
-  async deleteBook(req: Request, res: Response, next: NextFunction) {
+  deleteBook: async (req: AuthRequest, res: Response) => {
     try {
-      const book = await Book.findByIdAndDelete(req.params.id);
-      if (!book) {
-        throw new NotFoundError('Book not found');
+      const { id } = req.params;
+      
+      if (!req.userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
       }
+
+      await bookService.deleteBook(id, req.userId);
       res.status(200).json({ message: 'Book deleted successfully' });
     } catch (error) {
-      next(error);
+      console.error('Error deleting book:', error);
+      
+      if (error instanceof Error && error.message === 'Book not found or unauthorized') {
+        return res.status(404).json({ message: error.message });
+      }
+      
+      res.status(500).json({ message: 'Error deleting book' });
     }
   }
 };

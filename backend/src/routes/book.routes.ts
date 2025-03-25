@@ -1,22 +1,22 @@
 import { Router } from 'express';
 import { bookController } from '../controllers/book.controller';
 import { bookValidation, validate } from '../middleware/validation.middleware';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// GET /api/books - Get all books
-router.get('/', bookController.getAllBooks);
+router.use(authMiddleware);
 
-// GET /api/books/:id - Get a single book
-router.get('/:id', bookValidation.update[0], validate, bookController.getBookById);
+// Debug middleware
+router.use((req, res, next) => {
+  console.log('[Book Route]', req.method, req.path, req.body);
+  next();
+});
 
-// POST /api/books - Create a new book
+router.get('/', bookController.getBooks);
+router.get('/:id', bookController.getBookById);
 router.post('/', bookValidation.create, validate, bookController.createBook);
-
-// PUT /api/books/:id - Update a book
 router.put('/:id', bookValidation.update, validate, bookController.updateBook);
+router.delete('/:id', bookController.deleteBook);
 
-// DELETE /api/books/:id - Delete a book
-router.delete('/:id', bookValidation.update[0], validate, bookController.deleteBook);
-
-export const bookRoutes = router;
+export default router;

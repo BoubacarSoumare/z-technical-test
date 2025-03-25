@@ -1,37 +1,47 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IBook {
+// Base interface without _id
+interface BookBase {
   title: string;
   author: string;
   note?: string;
+  userId: mongoose.Types.ObjectId | string; // Updated type
   lastModifiedDate: Date;
 }
 
-export interface BookDocument extends IBook, Document {
-  _id: mongoose.Types.ObjectId;
+// Interface for creating new books
+export interface Book extends BookBase {
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const bookSchema = new Schema<BookDocument>({
-  title: { 
-    type: String, 
-    required: [true, 'Title is required'],
-    trim: true
-  },
-  author: { 
-    type: String, 
-    required: [true, 'Author is required'],
-    trim: true
-  },
-  note: { 
-    type: String,
-    trim: true
-  },
-  lastModifiedDate: { 
-    type: Date, 
-    default: Date.now 
-  }
-}, {
-  timestamps: true
+// Interface for documents from MongoDB
+export interface IBook extends Document {
+  title: string;
+  author: string;
+  note: string;
+  userId: mongoose.Types.ObjectId; // Updated type
+  lastModifiedDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const bookSchema = new Schema<IBook>({
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  note: { type: String, required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // Fixed type
+  lastModifiedDate: { type: Date, default: Date.now }
+}, { 
+  timestamps: true,
+  collection: 'books'
 });
 
-export const Book = mongoose.model<BookDocument>('Book', bookSchema);
+// Add logging to track saves
+bookSchema.pre('save', function(next) {
+  console.log('Saving book:', this.toObject());
+  next();
+});
+
+export const BookModel = mongoose.model<IBook>('Book', bookSchema);
+export default BookModel;
