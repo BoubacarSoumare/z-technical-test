@@ -1,19 +1,17 @@
-FROM node:20-alpine as builder
+FROM node:20
 
 WORKDIR /app
 
+# Copy configuration files
 COPY package*.json ./
+COPY proxy.conf.json ./
 
+# Install dependencies
 RUN npm install
 
+# Copy source code
 COPY . .
 
-RUN npm run build
+EXPOSE 4200
 
-FROM nginx:alpine
-
-COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]

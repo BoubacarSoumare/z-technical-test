@@ -1,28 +1,16 @@
+import { before, after } from 'mocha';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-let mongod: MongoMemoryServer;
+let mongoServer: MongoMemoryServer;
 
-beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
-  const uri = mongod.getUri();
-  await mongoose.connect(uri);
+before(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  await mongoose.connect(mongoUri);
 });
 
-beforeEach(async () => {
-  if (mongoose.connection.readyState === 1) {
-    const collections = mongoose.connection.collections;
-    await Promise.all(
-      Object.values(collections).map(collection => collection.deleteMany({}))
-    );
-  }
-});
-
-afterAll(async () => {
-  if (mongoose.connection.readyState === 1) {
-    await mongoose.connection.close();
-  }
-  if (mongod) {
-    await mongod.stop();
-  }
+after(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
 });
