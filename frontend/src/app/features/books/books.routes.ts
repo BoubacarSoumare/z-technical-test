@@ -4,6 +4,7 @@ export const BOOK_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
+
       import('./book-list/book-list.component')
         .then(m => m.BookListComponent)
   },
